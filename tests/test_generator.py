@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from generator import main
+from systems.generator import main
 
 
 def tree(root):
@@ -15,7 +15,7 @@ def tree(root):
 
 
 def pos_lines(root):
-    return [row for f in sorted(Path(root, "pos").rglob("*.csv")) for row in csv.DictReader(f.open())]
+    return [row for f in sorted(Path(root, "pos").rglob("*.csv")) for row in csv.DictReader(f.read_text().splitlines())]
 
 
 class GeneratorTest(unittest.TestCase):
@@ -61,7 +61,7 @@ class GeneratorTest(unittest.TestCase):
 
     def test_prices_rise_after_enabling(self):
         out = self.run_cli(["history", "--days", "120", "--scale", "0.1", "--issues", "price-changes"])
-        products = list(csv.DictReader(Path(out, "products.csv").open()))
+        products = list(csv.DictReader(Path(out, "products.csv").read_text().splitlines()))
         self.assertTrue(any(r["updated_on"] != "2025-11-01" for r in products))
 
 
