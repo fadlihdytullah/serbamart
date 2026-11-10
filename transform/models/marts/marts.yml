@@ -13,3 +13,18 @@ models:
         description: Store transactions or online orders.
       - name: revenue
         description: Sum of quantity times unit price, in rupiah.
+  - name: mart_branch_daily_sales
+    description: One row per branch per business day with its rank and the change against the 7 days before.
+    config:
+      meta:
+        owner: data
+    columns:
+      - name: avg_7_days
+        description: Average daily revenue over the 7 calendar days before, empty on the first day.
+      - name: rank
+        description: Rank by revenue among branches on that day, 1 is the highest.
+  - name: mart_product_daily_sales
+    description: Units and revenue per product, business day and channel.
+    config:
+      meta:
+        owner: merchandising
