@@ -3,3 +3,6 @@ __pycache__/
 .venv/
 output/
 warehouse/
+transform/target/
+transform/logs/
+transform/.user.yml
