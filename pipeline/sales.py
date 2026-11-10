@@ -1,5 +1,8 @@
 import csv
+import logging
 from pathlib import Path
+
+log = logging.getLogger(__name__)
 
 
 def read_sales(path):
@@ -11,9 +14,11 @@ def read_sales(path):
                 row["qty"] = int(row["qty"])
                 row["unit_price"] = int(row["unit_price"])
             except ValueError:
+                log.warning("%s line %d: bad qty %r or unit_price %r", path.name, line_number, row["qty"], row["unit_price"])
                 skipped.append(line_number)
                 continue
             rows.append(row)
+    log.debug("%s: %d rows read, %d skipped", path.name, len(rows), len(skipped))
     return rows, skipped
 
 
