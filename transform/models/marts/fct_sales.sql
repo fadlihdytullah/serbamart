@@ -1,10 +1,15 @@
 select
-    sale_id,
-    channel,
-    sales_date as date_day,
-    coalesce(branch_id, 'WEB') as branch_id,
-    sku,
-    qty,
-    unit_price,
-    revenue
-from {{ ref('int_sales_lines') }}
+    sales.sale_id,
+    sales.channel,
+    sales.sales_date as date_day,
+    coalesce(sales.branch_id, 'WEB') as branch_id,
+    products.product_key,
+    sales.sku,
+    sales.qty,
+    sales.unit_price,
+    sales.revenue
+from {{ ref('int_sales_lines') }} as sales
+left join {{ ref('dim_product') }} as products
+    on products.sku = sales.sku
+    and sales.sales_date >= products.valid_from
+    and sales.sales_date < products.valid_to

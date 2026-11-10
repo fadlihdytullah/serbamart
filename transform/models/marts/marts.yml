@@ -62,9 +62,23 @@ models:
               arguments:
                 to: ref('dim_branch')
                 field: branch_id
-      - name: sku
+      - name: product_key
         data_tests:
+          - not_null
           - relationships:
               arguments:
-                to: ref('stg_products')
-                field: sku
+                to: ref('dim_product')
+                field: product_key
+  - name: dim_product
+    description: One row per product per price, from the catalog snapshot (slowly changing dimension type 2).
+    config:
+      meta:
+        owner: merchandising
+    columns:
+      - name: product_key
+        description: One price version of one product.
+        data_tests: [unique, not_null]
+      - name: valid_from
+        description: First business day this price applies.
+      - name: valid_to
+        description: First day it no longer applies; 9999-12-31 for the current price.
