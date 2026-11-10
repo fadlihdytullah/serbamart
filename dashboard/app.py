@@ -19,6 +19,7 @@ def rupiah(amount):
 st.title("Serbamart sales")
 
 bounds = query("select min(date_day) as first_day, max(date_day) as last_day from marts.fct_sales").iloc[0]
+st.caption(f"Data through {bounds['last_day'].date()}, refreshed by the nightly run.")
 cities = query("select distinct city from marts.dim_branch order by city")["city"].tolist()
 
 with st.sidebar:
@@ -29,6 +30,9 @@ with st.sidebar:
         max_value=bounds["last_day"].date(),
     )
     chosen = st.multiselect("Cities", cities, default=cities)
+    if st.button("Reload data"):
+        st.cache_data.clear()
+        st.rerun()
 
 if len(days) < 2:
     st.info("Pick the last day of the range.")
@@ -81,3 +85,14 @@ top = query(f"""
 """, params)
 right.subheader("Top products")
 right.dataframe(top, hide_index=True)
+
+st.subheader("Price history")
+products = query("select distinct sku, name from marts.dim_product order by sku")
+sku = st.selectbox("Product", products["sku"], format_func=lambda s: f"{s} {products.set_index('sku').loc[s, 'name']}")
+prices = query("""
+    select valid_from, unit_price, is_current
+    from marts.dim_product
+    where sku = ?
+    order by valid_from
+""", [sku])
+st.dataframe(prices, hide_index=True)
