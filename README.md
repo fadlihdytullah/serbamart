@@ -57,3 +57,17 @@ Settings by environment variable: `SERBAMART_DATA` (default `data`), `SERBAMART_
 ```sh
 uv run python -m unittest discover tests
 ```
+
+## Run the pipeline in Airflow
+
+```sh
+docker compose up -d
+```
+
+| Service   | URL                   | What it does                                       |
+| --------- | --------------------- | -------------------------------------------------- |
+| Airflow   | http://localhost:8080 | `serbamart_nightly` at 01:00 WIB, `serbamart_reload` for backfills, `serbamart_stores` closes one more day |
+| API       | http://localhost:8000 | the online store API                               |
+| Dashboard | http://localhost:8501 | the Streamlit sales dashboard                      |
+
+DuckDB allows one writer, and its lock does not reach from your machine into the containers. While Compose is up, change the warehouse only through Airflow, or run commands inside it: `docker compose exec airflow-scheduler bash`, then `cd /opt/serbamart`. Stop everything with `docker compose down`.
