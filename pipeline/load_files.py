@@ -13,11 +13,21 @@ def load_files(con, table, pattern):
         from read_csv('{pattern}', all_varchar = true, filename = true)
         limit 0
     """)
-    con.sql(f"""
-        insert into raw.{table} by name
-        select * rename (filename as _source_file), current_timestamp as _loaded_at
-        from read_csv('{pattern}', all_varchar = true, filename = true)
-    """)
+    con.begin()
+    try:
+        con.sql(f"""
+            delete from raw.{table}
+            where _source_file in (select file from glob('{pattern}'))
+        """)
+        con.sql(f"""
+            insert into raw.{table} by name
+            select * rename (filename as _source_file), current_timestamp as _loaded_at
+            from read_csv('{pattern}', all_varchar = true, filename = true)
+        """)
+        con.commit()
+    except Exception:
+        con.rollback()
+        raise
 
 
 if __name__ == "__main__":
