@@ -1,3 +1,5 @@
+import time
+
 from warehouse import connect
 
 SOURCES = {
@@ -6,7 +8,18 @@ SOURCES = {
 }
 
 
+def new_files(con, table, pattern):
+    return [row[0] for row in con.execute("""
+        select file from glob(?)
+        where file not in (select batch from raw.load_log where source = ?)
+        order by file
+    """, [pattern, table]).fetchall()]
+
+
 def load_files(con, table, pattern):
+    files = new_files(con, table, pattern)
+    if not files:
+        return 0, 0
     con.sql(f"""
         create table if not exists raw.{table} as
         select * rename (filename as _source_file), current_timestamp as _loaded_at
@@ -15,27 +28,30 @@ def load_files(con, table, pattern):
     """)
     con.begin()
     try:
-        con.sql(f"""
-            delete from raw.{table}
-            where _source_file in (select file from glob('{pattern}'))
-        """)
-        con.sql(f"""
+        con.execute(f"delete from raw.{table} where _source_file in (select unnest(?))", [files])
+        con.execute(f"""
             insert into raw.{table} by name
             select * rename (filename as _source_file), current_timestamp as _loaded_at
-            from read_csv('{pattern}', all_varchar = true, filename = true)
-        """)
+            from read_csv(?, all_varchar = true, filename = true)
+        """, [files])
+        con.execute(f"""
+            insert into raw.load_log
+            select ?, _source_file, count(*), current_timestamp
+            from raw.{table}
+            where _source_file in (select unnest(?))
+            group by _source_file
+        """, [table, files])
         con.commit()
     except Exception:
         con.rollback()
         raise
+    rows = con.execute(f"select count(*) from raw.{table} where _source_file in (select unnest(?))", [files]).fetchall()[0][0]
+    return len(files), rows
 
 
 if __name__ == "__main__":
     con = connect()
     for table, pattern in SOURCES.items():
-        load_files(con, table, pattern)
-    con.sql("""
-        select 'pos_sales' as table_name, count(*) as rows, count(distinct _source_file) as files from raw.pos_sales
-        union all
-        select 'stock', count(*), count(distinct _source_file) from raw.stock
-    """).show()
+        start = time.perf_counter()
+        files, rows = load_files(con, table, pattern)
+        print(f"{table:<10} {files:>6} new files {rows:>8} rows  {time.perf_counter() - start:.2f} s")
