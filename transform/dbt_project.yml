@@ -1,3 +1,6 @@
 name: serbamart
 version: "1.0.0"
 profile: serbamart
+
+vars:
+  business_timezone: Asia/Jakarta
