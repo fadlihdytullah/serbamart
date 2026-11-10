@@ -36,10 +36,10 @@ def load_files(con, table, pattern):
         """, [files])
         con.execute(f"""
             insert into raw.load_log
-            select ?, _source_file, count(*), current_timestamp
-            from raw.{table}
-            where _source_file in (select unnest(?))
-            group by _source_file
+            select ?, f.file, count(t._source_file), current_timestamp
+            from (select unnest(?) as file) as f
+            left join raw.{table} as t on t._source_file = f.file
+            group by f.file
         """, [table, files])
         con.commit()
     except Exception:

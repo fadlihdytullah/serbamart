@@ -28,7 +28,7 @@ for table, pattern in SOURCES.items():
     files, rows = load_files(con, table, pattern)
     print(f"{table:<20} {files:>6} new files {rows:>8} rows")
 
-start = next_day_to_load(con) or args.start
+start = args.start or next_day_to_load(con)
 if start is None:
     sys.exit("Nothing loaded from the API yet: pass --from for the first load.")
 days, rows = load_orders(con, s, start, last_closed_day())

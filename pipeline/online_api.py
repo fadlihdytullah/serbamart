@@ -3,7 +3,8 @@ import logging
 import os
 import sys
 import time
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
+from email.utils import parsedate_to_datetime
 
 import requests
 
@@ -23,6 +24,12 @@ def session():
     return s
 
 
+def retry_after(value):
+    if value.isdigit():
+        return int(value)
+    return max(1, round((parsedate_to_datetime(value) - datetime.now(timezone.utc)).total_seconds()))
+
+
 def get_page(s, params, tries=5):
     for attempt in range(1, tries + 1):
         try:
@@ -31,7 +38,7 @@ def get_page(s, params, tries=5):
             wait, reason = 2 ** attempt, type(error).__name__
         else:
             if response.status_code == 429:
-                wait, reason = int(response.headers["Retry-After"]), "429 Too Many Requests"
+                wait, reason = retry_after(response.headers["Retry-After"]), "429 Too Many Requests"
             elif response.status_code >= 500:
                 wait, reason = 2 ** attempt, f"{response.status_code} {response.reason}"
             else:

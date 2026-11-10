@@ -71,7 +71,7 @@ if __name__ == "__main__":
         sys.exit("Nothing loaded yet: pass --from for the first load.")
     end = args.end or last_closed_day()
     if start > end:
-        print(f"Up to date: orders are loaded through {end}.")
+        print(f"Nothing to load: {start} is after {end}, the last day the stores closed.")
         sys.exit()
 
     started = time.perf_counter()
