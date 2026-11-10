@@ -28,3 +28,11 @@ models:
     config:
       meta:
         owner: merchandising
+  - name: dim_branch
+    description: One row per branch, plus the web shop as branch WEB, so every sale has a place.
+    config:
+      meta:
+        owner: operations
+    columns:
+      - name: branch_id
+        data_tests: [unique, not_null]
