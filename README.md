@@ -3,7 +3,7 @@
 Serbamart is a fictional 30-branch minimarket chain used in the suikodev Data Engineer path. Not a real brand.
 
 - `systems/` is the company's side, already built by its dev team: a data generator and the online store API. You use them, you don't change them.
-- `pipeline/` is your side: the code you write part by part. Each part has a tag (`<series-id>/part-N`) so you can compare your work or jump ahead.
+- `pipeline/` is your side: the code you write part by part. Each part has a tag (`<series-id>/part-N`, for example `python-for-data/part-3`) so you can compare your work or jump ahead. Stage 1 series in order: `python-for-data`, `sql-analytics-on-files`, `cleaning-messy-data`.
 
 ## Generate data
 
@@ -32,7 +32,7 @@ data/
   branches.csv
   products.csv                              current prices
   pos/<arrival-date>/<branch>_<sales-date>.csv
-  stock/<date>.csv                          end-of-day stock per branch
+  stock/<date>.csv                          end-of-day stock per branch; the warehouse refills a product to 80 at opening when it closed below 15
   online/orders/<date>.jsonl                web shop orders, served by the API
 ```
 
