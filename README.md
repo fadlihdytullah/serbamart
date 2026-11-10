@@ -50,7 +50,7 @@ Docs at http://localhost:8000/docs. Send `X-API-Key: serbamart-dev-key`.
 | `GET /orders/{id}`   | one order                                                        |
 | `GET /health`        | `{"status": "ok"}`, no key needed                                |
 
-Settings by environment variable: `SERBAMART_DATA` (default `data`), `SERBAMART_API_KEY`, `SERBAMART_RATE_LIMIT` (requests per minute, default 60, then 429 with `Retry-After`), `SERBAMART_FLAKY` (share of requests that fail with 503, default 0), `PORT`.
+Settings by environment variable: `SERBAMART_DATA` (default `data`), `SERBAMART_API_KEY`, `SERBAMART_RATE_LIMIT` (requests per minute, default 60, then 429 with `Retry-After`), `SERBAMART_FLAKY` (share of requests that fail with 503, default 0), `HOST` (default `127.0.0.1`), `PORT`.
 
 ## Test
 
