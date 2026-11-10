@@ -14,7 +14,8 @@ con.sql("""
         count(*) filter (where qty is null) as missing_qty,
         count(*) filter (where payment_method is null) as missing_payment,
         count(*) filter (where qty like '%.%') as odd_qty,
-        count(*) filter (where try_cast(unit_price as integer) is null) as odd_price
+        count(*) filter (where try_cast(unit_price as integer) is null) as odd_price,
+        count(*) filter (where length(sold_at) = 19) as no_offset
     from raw
 """).show()
 
