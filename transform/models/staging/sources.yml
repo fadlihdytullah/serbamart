@@ -1,9 +1,15 @@
 sources:
   - name: raw
     schema: raw
+    description: Files and API orders as loaded by pipeline/load.py, every column as text.
     tables:
       - name: branches
+        description: Branch master data, reloaded in full on every load.
       - name: products
+        description: Product catalog with the current price, reloaded in full on every load.
       - name: pos_sales
+        description: One row per line in a cashier export file, duplicates and bad values included.
       - name: stock
+        description: End-of-day stock per branch and product; the day lives in the file name.
       - name: online_orders
+        description: One row per web shop order, the API response kept as a JSON payload.

@@ -1,0 +1,15 @@
+models:
+  - name: mart_daily_sales
+    description: Revenue per business day and channel (store or online), for reports and dashboards.
+    config:
+      meta:
+        owner: data
+    columns:
+      - name: sales_date
+        description: Business day in Jakarta time (WIB).
+      - name: channel
+        description: store for cashier sales, online for paid web shop orders.
+      - name: sales
+        description: Store transactions or online orders.
+      - name: revenue
+        description: Sum of quantity times unit price, in rupiah.

@@ -1,13 +1,25 @@
 models:
   - name: stg_branches
+    description: One row per branch.
+    config:
+      meta:
+        owner: operations
     columns:
       - name: branch_id
         data_tests: [unique, not_null]
   - name: stg_products
+    description: One row per product with its current catalog price.
+    config:
+      meta:
+        owner: merchandising
     columns:
       - name: sku
         data_tests: [unique, not_null]
   - name: stg_pos_sales
+    description: Cleaned cashier sales, one row per product per transaction, without duplicates or empty quantities.
+    config:
+      meta:
+        owner: data
     columns:
       - name: transaction_id
         data_tests: [not_null]
@@ -23,16 +35,26 @@ models:
               arguments:
                 to: ref('stg_products')
                 field: sku
+      - name: sold_at
+        description: Moment of the sale as a timestamp with time zone, also for files that lost their offset.
+      - name: sales_date
+        description: Day of the sale in Jakarta time (WIB), the business day of every report.
       - name: payment_method
+        description: cash, qris, debit or ewallet; unknown when the file left it empty.
         data_tests:
           - accepted_values:
               arguments:
                 values: [cash, qris, debit, ewallet, unknown]
   - name: stg_online_orders
+    description: One row per web shop order.
+    config:
+      meta:
+        owner: data
     columns:
       - name: order_id
         data_tests: [unique, not_null]
       - name: status
+        description: paid or cancelled; only paid orders count as sales.
         data_tests:
           - accepted_values:
               arguments:
