@@ -6,7 +6,7 @@ SERBAMART = "/opt/serbamart"
 VENV = "/home/airflow/serbamart/bin"
 
 
-@dag(schedule=None, start_date=datetime(2026, 11, 1), catchup=False, tags=["serbamart"])
+@dag(schedule="0 1 * * *", start_date=datetime(2026, 11, 1), catchup=False, tags=["serbamart"])
 def serbamart_nightly():
     @task.bash(cwd=SERBAMART)
     def load_sources():
