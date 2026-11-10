@@ -1,0 +1,8 @@
+snapshots:
+  - name: products_snapshot
+    relation: ref('stg_products')
+    config:
+      schema: snapshots
+      unique_key: sku
+      strategy: timestamp
+      updated_at: updated_on
