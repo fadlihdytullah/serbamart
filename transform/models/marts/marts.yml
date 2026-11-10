@@ -36,3 +36,11 @@ models:
     columns:
       - name: branch_id
         data_tests: [unique, not_null]
+  - name: dim_date
+    description: One row per calendar day from the first to the last sale, with the labels reports group by.
+    config:
+      meta:
+        owner: data
+    columns:
+      - name: date_day
+        data_tests: [unique, not_null]
