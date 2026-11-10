@@ -61,7 +61,7 @@ services:
 
   airflow-init:
     <<: *airflow
-    command: db migrate
+    command: bash -c "airflow db migrate && airflow pools set warehouse 1 'One writer at a time for DuckDB'"
 
   airflow-apiserver:
     <<: *airflow

@@ -20,15 +20,15 @@ VENV = "/home/airflow/serbamart/bin"
     tags=["serbamart"],
 )
 def serbamart_nightly():
-    @task.bash(cwd=SERBAMART)
+    @task.bash(cwd=SERBAMART, pool="warehouse")
     def load_sources():
         return f"{VENV}/python pipeline/load.py"
 
-    @task.bash(cwd=f"{SERBAMART}/transform")
+    @task.bash(cwd=f"{SERBAMART}/transform", pool="warehouse")
     def build_models():
         return f"{VENV}/dbt build"
 
-    @task.bash(cwd=SERBAMART)
+    @task.bash(cwd=SERBAMART, pool="warehouse")
     def daily_report():
         return f"{VENV}/python pipeline/daily_report.py"
 

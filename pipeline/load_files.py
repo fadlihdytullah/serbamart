@@ -16,8 +16,9 @@ def new_files(con, table, pattern):
     """, [pattern, table]).fetchall()]
 
 
-def load_files(con, table, pattern):
-    files = new_files(con, table, pattern)
+def load_files(con, table, pattern, files=None):
+    if files is None:
+        files = new_files(con, table, pattern)
     if not files:
         return 0, 0
     con.sql(f"""
