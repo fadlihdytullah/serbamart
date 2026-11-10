@@ -6,6 +6,7 @@ x-airflow: &airflow
   environment:
     SERBAMART_API_URL: http://api:8000
     SERBAMART_API_KEY: serbamart-dev-key
+    DBT_USE_COLORS: "false"
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg://airflow:airflow@postgres/airflow
     AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-apiserver:8080/execution/

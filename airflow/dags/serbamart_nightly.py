@@ -12,7 +12,15 @@ def serbamart_nightly():
     def load_sources():
         return f"{VENV}/python pipeline/load.py"
 
-    load_sources()
+    @task.bash(cwd=f"{SERBAMART}/transform")
+    def build_models():
+        return f"{VENV}/dbt build"
+
+    @task.bash(cwd=SERBAMART)
+    def daily_report():
+        return f"{VENV}/python pipeline/daily_report.py"
+
+    load_sources() >> build_models() >> daily_report()
 
 
 serbamart_nightly()
