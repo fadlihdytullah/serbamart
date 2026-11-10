@@ -1,3 +1,4 @@
+import subprocess
 from datetime import datetime, timedelta
 
 from airflow.sdk import dag, task
@@ -20,6 +21,12 @@ VENV = "/home/airflow/serbamart/bin"
     tags=["serbamart"],
 )
 def serbamart_nightly():
+    @task.sensor(poke_interval=60, timeout=timedelta(hours=6), mode="reschedule", pool="warehouse")
+    def stores_closed():
+        result = subprocess.run([f"{VENV}/python", "pipeline/new_days.py"], cwd=SERBAMART, capture_output=True, text=True)
+        print(result.stdout or "No new day yet")
+        return result.returncode == 0
+
     @task.bash(cwd=SERBAMART, pool="warehouse")
     def load_sources():
         return f"{VENV}/python pipeline/load.py"
@@ -32,7 +39,7 @@ def serbamart_nightly():
     def daily_report():
         return f"{VENV}/python pipeline/daily_report.py"
 
-    load_sources() >> build_models() >> daily_report()
+    stores_closed() >> load_sources() >> build_models() >> daily_report()
 
 
 serbamart_nightly()
