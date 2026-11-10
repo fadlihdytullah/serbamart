@@ -4,3 +4,15 @@ profile: serbamart
 
 vars:
   business_timezone: Asia/Jakarta
+
+models:
+  serbamart:
+    staging:
+      +schema: staging
+      +materialized: view
+    intermediate:
+      +schema: intermediate
+      +materialized: ephemeral
+    marts:
+      +schema: marts
+      +materialized: table
