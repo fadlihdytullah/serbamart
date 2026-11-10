@@ -33,6 +33,7 @@ services:
     environment:
       HOST: 0.0.0.0
       SERBAMART_API_KEY: serbamart-dev-key
+      SERBAMART_FLAKY: ${SERBAMART_FLAKY:-0}
     ports:
       - "8000:8000"
     depends_on: []
