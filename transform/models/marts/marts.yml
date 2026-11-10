@@ -44,3 +44,27 @@ models:
     columns:
       - name: date_day
         data_tests: [unique, not_null]
+  - name: fct_sales
+    description: One row per product per sale, from the cashiers and the web shop; the center of the star.
+    config:
+      meta:
+        owner: data
+    columns:
+      - name: date_day
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_day
+      - name: branch_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_branch')
+                field: branch_id
+      - name: sku
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_products')
+                field: sku
