@@ -39,6 +39,9 @@ con.execute("""
     order by rank
 """, [day])
 
+if con.execute("select count(*) from report").fetchall()[0][0] == 0:
+    sys.exit(f"No sales found for {day}.")
+
 store = con.execute("select sum(transactions), sum(revenue) from report").fetchall()[0]
 online = con.execute("""
     select count(distinct order_id), sum(item.qty * item.unit_price)
