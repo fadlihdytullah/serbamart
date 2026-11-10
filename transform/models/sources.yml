@@ -1,0 +1,9 @@
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: branches
+      - name: products
+      - name: pos_sales
+      - name: stock
+      - name: online_orders
