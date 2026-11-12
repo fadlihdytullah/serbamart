@@ -1,3 +1,5 @@
+{{ config(materialized='incremental', incremental_strategy='delete+insert', unique_key='sales_date') }}
+
 with branch_days as (
     select
         branch_id,
@@ -6,6 +8,9 @@ with branch_days as (
         sum(revenue) as revenue
     from {{ ref('int_sales_lines') }}
     where channel = 'store'
+    {% if is_incremental() %}
+    and sales_date >= (select max(sales_date) - interval 7 days from {{ this }})
+    {% endif %}
     group by branch_id, sales_date
 ),
 
@@ -32,3 +37,6 @@ select
     rank() over (partition by with_average.sales_date order by with_average.revenue desc) as rank
 from with_average
 join {{ ref('stg_branches') }} as branches using (branch_id)
+{% if is_incremental() %}
+where with_average.sales_date >= (select max(sales_date) from {{ this }})
+{% endif %}

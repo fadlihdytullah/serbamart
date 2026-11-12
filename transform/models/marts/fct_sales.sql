@@ -1,3 +1,5 @@
+{{ config(materialized='incremental', incremental_strategy='delete+insert', unique_key='date_day', on_schema_change='fail') }}
+
 select
     sales.sale_id,
     sales.channel,
@@ -13,3 +15,6 @@ left join {{ ref('dim_product') }} as products
     on products.sku = sales.sku
     and sales.sales_date >= products.valid_from
     and sales.sales_date < products.valid_to
+{% if is_incremental() %}
+where sales.sales_date >= (select max(date_day) from {{ this }})
+{% endif %}
