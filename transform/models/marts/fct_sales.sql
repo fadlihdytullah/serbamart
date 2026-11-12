@@ -16,5 +16,5 @@ left join {{ ref('dim_product') }} as products
     and sales.sales_date >= products.valid_from
     and sales.sales_date < products.valid_to
 {% if is_incremental() %}
-where sales.sales_date >= (select max(date_day) from {{ this }})
+where sales.sales_date >= {{ incremental_since('date_day') }}
 {% endif %}

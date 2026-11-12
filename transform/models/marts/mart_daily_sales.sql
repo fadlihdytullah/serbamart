@@ -8,6 +8,6 @@ select
     sum(revenue) as revenue
 from {{ ref('int_sales_lines') }}
 {% if is_incremental() %}
-where sales_date >= (select max(sales_date) from {{ this }})
+where sales_date >= {{ incremental_since('sales_date') }}
 {% endif %}
 group by sales_date, channel

@@ -4,6 +4,7 @@ profile: serbamart
 
 vars:
   business_timezone: Asia/Jakarta
+  lookback_days: 3
 
 models:
   serbamart:

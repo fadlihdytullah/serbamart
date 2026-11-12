@@ -11,6 +11,6 @@ select
 from {{ ref('int_sales_lines') }} as lines
 join {{ ref('stg_products') }} as products using (sku)
 {% if is_incremental() %}
-where lines.sales_date >= (select max(sales_date) from {{ this }})
+where lines.sales_date >= {{ incremental_since('sales_date') }}
 {% endif %}
 group by all

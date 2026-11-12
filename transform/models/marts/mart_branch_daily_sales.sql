@@ -9,7 +9,7 @@ with branch_days as (
     from {{ ref('int_sales_lines') }}
     where channel = 'store'
     {% if is_incremental() %}
-    and sales_date >= (select max(sales_date) - interval 7 days from {{ this }})
+    and sales_date >= {{ incremental_since('sales_date') }} - interval 7 days
     {% endif %}
     group by branch_id, sales_date
 ),
@@ -38,5 +38,5 @@ select
 from with_average
 join {{ ref('stg_branches') }} as branches using (branch_id)
 {% if is_incremental() %}
-where with_average.sales_date >= (select max(sales_date) from {{ this }})
+where with_average.sales_date >= {{ incremental_since('sales_date') }}
 {% endif %}

@@ -21,8 +21,9 @@ def serbamart_reload():
         return f"{VENV}/python pipeline/reload_day.py {day}"
 
     @task.bash(cwd=f"{SERBAMART}/transform", pool="warehouse")
-    def build_models():
-        return f"{VENV}/dbt build"
+    def build_models(logical_date=None):
+        day = logical_date.in_timezone("Asia/Jakarta").date()
+        return f"{VENV}/dbt build --vars '{{from_day: {day}}}'"
 
     reload_day() >> build_models()
 

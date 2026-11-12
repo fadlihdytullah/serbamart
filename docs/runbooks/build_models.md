@@ -21,6 +21,12 @@ docker compose exec -w /opt/serbamart airflow-scheduler /home/airflow/serbamart/
 docker compose exec -w /opt/serbamart airflow-scheduler /home/airflow/serbamart/bin/python pipeline/reload_day.py <day>
 ```
 
+  The nightly build only rebuilds the last 3 days (`lookback_days`). For an older arrival day, rebuild from it before the rerun (dbt also goes 3 days further back, for the late files in that folder):
+
+```bash
+docker compose exec -w /opt/serbamart/transform airflow-scheduler /home/airflow/serbamart/bin/dbt build --vars '{from_day: <day>}'
+```
+
 - Contract error: a model changed its columns. Fix the model or the contract in a pull request, never in the night.
 - Never lower a test to `warn` to get the night through.
 
