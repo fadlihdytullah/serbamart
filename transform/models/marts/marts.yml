@@ -49,26 +49,51 @@ models:
     config:
       meta:
         owner: data
+      contract:
+        enforced: true
     columns:
+      - name: sale_id
+        data_type: varchar
+        constraints:
+          - type: not_null
+      - name: channel
+        data_type: varchar
+        constraints:
+          - type: not_null
       - name: date_day
+        data_type: date
+        constraints:
+          - type: not_null
         data_tests:
           - relationships:
               arguments:
                 to: ref('dim_date')
                 field: date_day
       - name: branch_id
+        data_type: varchar
+        constraints:
+          - type: not_null
         data_tests:
           - relationships:
               arguments:
                 to: ref('dim_branch')
                 field: branch_id
       - name: product_key
+        data_type: varchar
         data_tests:
           - not_null
           - relationships:
               arguments:
                 to: ref('dim_product')
                 field: product_key
+      - name: sku
+        data_type: varchar
+      - name: qty
+        data_type: integer
+      - name: unit_price
+        data_type: integer
+      - name: revenue
+        data_type: integer
   - name: dim_product
     description: One row per product per price, from the catalog snapshot (slowly changing dimension type 2).
     config:
