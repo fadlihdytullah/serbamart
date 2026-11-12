@@ -1,10 +1,21 @@
 import subprocess
 from datetime import datetime, timedelta
 
+from airflow.providers.smtp.notifications.smtp import SmtpNotifier
 from airflow.sdk import dag, task
 
 SERBAMART = "/opt/serbamart"
 VENV = "/home/airflow/serbamart/bin"
+
+alert = SmtpNotifier(
+    from_email="airflow@serbamart.example",
+    to="data-team@serbamart.example",
+    subject="[Serbamart] {{ ti.task_id }} failed on {{ dag.dag_id }}",
+    html_content=(
+        "<p>Task <b>{{ ti.task_id }}</b> failed after {{ ti.try_number }} attempt(s).</p>"
+        '<p><a href="{{ ti.log_url }}">Open the log</a></p>'
+    ),
+)
 
 
 @dag(
@@ -17,6 +28,7 @@ VENV = "/home/airflow/serbamart/bin"
         "retry_delay": timedelta(seconds=30),
         "retry_exponential_backoff": 2.0,
         "execution_timeout": timedelta(minutes=30),
+        "on_failure_callback": alert,
     },
     tags=["serbamart"],
 )
@@ -31,7 +43,7 @@ def serbamart_nightly():
     def load_sources():
         return f"{VENV}/python pipeline/load.py"
 
-    @task.bash(cwd=f"{SERBAMART}/transform", pool="warehouse")
+    @task.bash(cwd=f"{SERBAMART}/transform", pool="warehouse", retries=0)
     def build_models():
         return f"{VENV}/dbt build"
 

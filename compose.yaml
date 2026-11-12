@@ -7,6 +7,7 @@ x-airflow: &airflow
     SERBAMART_API_URL: http://api:8000
     SERBAMART_API_KEY: serbamart-dev-key
     DBT_USE_COLORS: "false"
+    AIRFLOW_CONN_SMTP_DEFAULT: smtp://mailpit:1025?disable_tls=true&disable_ssl=true
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg://airflow:airflow@postgres/airflow
     AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-apiserver:8080/execution/
@@ -58,6 +59,11 @@ services:
     ports:
       - "8501:8501"
     depends_on: []
+
+  mailpit:
+    image: axllent/mailpit:v1.33.1
+    ports:
+      - "8025:8025"
 
   airflow-init:
     <<: *airflow
