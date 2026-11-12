@@ -5,7 +5,7 @@ import time
 from datetime import date
 
 from load_api import last_closed_day, load_orders, next_day_to_load
-from load_files import SOURCES, load_files
+from load_files import SOURCES, load_files, new_files
 from load_masters import load_masters
 from online_api import session
 from warehouse import connect
@@ -24,9 +24,11 @@ s = session()
 load_masters(con)
 print(f"{'branches, products':<20} full refresh")
 
+loaded = {}
 for table, pattern in SOURCES.items():
-    files, rows = load_files(con, table, pattern)
-    print(f"{table:<20} {files:>6} new files {rows:>8} rows")
+    loaded[table] = new_files(con, table, pattern)
+    count, rows = load_files(con, table, pattern, loaded[table])
+    print(f"{table:<20} {count:>6} new files {rows:>8} rows")
 
 start = args.start or next_day_to_load(con)
 if start is None:
@@ -34,31 +36,27 @@ if start is None:
 days, rows = load_orders(con, s, start, last_closed_day())
 print(f"{'online_orders':<20} {days:>6} new days  {rows:>8} rows")
 
-checks = {
-    "pos_sales": (
-        "select count(*) from read_csv('data/pos/*/*.csv', all_varchar = true)",
-        "select count(*) from raw.pos_sales",
-    ),
-    "stock": (
-        "select count(*) from read_csv('data/stock/*.csv', all_varchar = true)",
-        "select count(*) from raw.stock",
-    ),
-    "online_orders": (
-        """select sum(rows) from (
-            select batch, arg_max(rows, loaded_at) as rows
-            from raw.load_log where source = 'online_orders' group by batch
-        )""",
-        "select count(*) from raw.online_orders",
-    ),
-}
+checks = []
+for table, files in loaded.items():
+    if files:
+        source = con.execute("select count(*) from read_csv(?, all_varchar = true)", [files]).fetchall()[0][0]
+        in_warehouse = con.execute(f"select count(*) from raw.{table} where _source_file in (select unnest(?))", [files]).fetchall()[0][0]
+        checks.append((table, source, in_warehouse))
+
+source = con.execute("""
+    select sum(rows) from (
+        select batch, arg_max(rows, loaded_at) as rows
+        from raw.load_log where source = 'online_orders' group by batch
+    )
+""").fetchall()[0][0]
+in_warehouse = con.execute("select count(*) from raw.online_orders").fetchall()[0][0]
+checks.append(("online_orders", source, in_warehouse))
 
 print()
 failed = 0
-for table, (source_sql, warehouse_sql) in checks.items():
-    source = con.execute(source_sql).fetchall()[0][0]
-    loaded = con.execute(warehouse_sql).fetchall()[0][0]
-    print(f"{'ok' if source == loaded else 'FAIL':<5} {table:<14} source {source:>8}  warehouse {loaded:>8}")
-    failed += source != loaded
+for table, source, in_warehouse in checks:
+    print(f"{'ok' if source == in_warehouse else 'FAIL':<5} {table:<14} source {source:>8}  warehouse {in_warehouse:>8}")
+    failed += source != in_warehouse
 
 print(f"\nDone in {time.perf_counter() - started:.1f} s")
 if failed:
