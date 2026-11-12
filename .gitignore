@@ -7,3 +7,5 @@ transform/target/
 transform/logs/
 transform/.user.yml
 airflow/logs/
+exports/*
+!exports/.gitkeep

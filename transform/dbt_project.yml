@@ -16,6 +16,9 @@ models:
     marts:
       +schema: marts
       +materialized: table
+    exports:
+      +schema: exports
+      +materialized: external
 
 data_tests:
   serbamart:
