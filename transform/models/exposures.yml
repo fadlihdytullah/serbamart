@@ -1,0 +1,38 @@
+exposures:
+  - name: sales_dashboard
+    label: Sales dashboard
+    type: dashboard
+    maturity: high
+    url: http://localhost:8501
+    description: The Streamlit page the head office opens every morning, in dashboard/app.py.
+    depends_on:
+      - ref('fct_sales')
+      - ref('dim_branch')
+      - ref('dim_product')
+    owner:
+      name: Data team
+      email: data-team@serbamart.example
+
+  - name: daily_report
+    label: Daily branch report
+    type: application
+    maturity: high
+    description: pipeline/daily_report.py, run by Airflow after every nightly build.
+    depends_on:
+      - ref('mart_daily_sales')
+      - ref('mart_branch_daily_sales')
+      - ref('mart_product_daily_sales')
+    owner:
+      name: Data team
+      email: data-team@serbamart.example
+
+  - name: finance_export
+    label: Finance Parquet export
+    type: analysis
+    maturity: medium
+    description: Daily Parquet files in exports/fct_sales that the finance team reads with their own tools.
+    depends_on:
+      - ref('export_fct_sales')
+    owner:
+      name: Finance
+      email: finance@serbamart.example

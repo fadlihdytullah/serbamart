@@ -1,0 +1,6 @@
+models:
+  - name: export_fct_sales
+    description: fct_sales as Parquet files in exports/fct_sales, one folder per business day.
+    config:
+      meta:
+        owner: data
