@@ -12,11 +12,13 @@ x-airflow: &airflow
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg://airflow:airflow@postgres/airflow
     AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-apiserver:8080/execution/
     AIRFLOW__API_AUTH__JWT_SECRET: serbamart-local-secret
+    AIRFLOW__CORE__FERNET_KEY: ahXoNuuUWs6pNGFG4gjm23hgezFkNYBTrl4ie_yjnLg=
     AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS: "true"
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
     AIRFLOW__CORE__DEFAULT_TIMEZONE: Asia/Jakarta
     AIRFLOW__DAG_PROCESSOR__REFRESH_INTERVAL: "30"
     PYTHONWARNINGS: ignore::PendingDeprecationWarning
+    SERBAMART_NIGHTLY_BUDGET_MINUTES: ${SERBAMART_NIGHTLY_BUDGET_MINUTES:-300}
   volumes:
     - ./airflow/dags:/opt/airflow/dags
     - ./airflow/logs:/opt/airflow/logs

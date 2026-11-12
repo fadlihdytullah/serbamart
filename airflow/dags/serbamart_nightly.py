@@ -1,12 +1,14 @@
+import os
 import subprocess
 from datetime import datetime, timedelta
 
-from airflow.sdk import dag, task
+from airflow.sdk import DeadlineAlert, DeadlineReference, dag, task
 
-from alerts import alert
+from alerts import alert, late
 
 SERBAMART = "/opt/serbamart"
 VENV = "/home/airflow/serbamart/bin"
+BUDGET = timedelta(minutes=int(os.environ.get("SERBAMART_NIGHTLY_BUDGET_MINUTES", "300")))
 
 
 @dag(
@@ -14,6 +16,7 @@ VENV = "/home/airflow/serbamart/bin"
     start_date=datetime(2026, 11, 1),
     catchup=False,
     max_active_runs=1,
+    deadline=DeadlineAlert(reference=DeadlineReference.DAGRUN_QUEUED_AT, interval=BUDGET, callback=late),
     default_args={
         "retries": 3,
         "retry_delay": timedelta(seconds=30),

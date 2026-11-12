@@ -74,3 +74,17 @@ docker compose up -d
 DuckDB allows one writer, and its lock does not reach from your machine into the containers. While Compose is up, change the warehouse only through Airflow, or run commands inside it: `docker compose exec airflow-scheduler bash`, then `cd /opt/serbamart`. Stop everything with `docker compose down`.
 
 When a task fails, its runbook in `docs/runbooks/` says what to check, how to fix it and how to rerun.
+
+`serbamart_nightly` has a time budget: when a run is not finished 300 minutes after it was queued (06:00 WIB for the 01:00 run), an email goes to Mailpit with the `deadline` runbook. Change it with `SERBAMART_NIGHTLY_BUDGET_MINUTES=<minutes> docker compose up -d`. The Fernet key in `compose.yaml` is for this local setup only.
+
+## Exports and docs
+
+Every `dbt build` writes `fct_sales` as Parquet to `exports/fct_sales/date_day=<day>/`, one folder per business day, for tools that should not open the warehouse.
+
+`uv run pipeline/timings.py` lists the slowest models and tests of the last dbt run. For the lineage graph, with the dashboard, the daily report and the finance export as exposures:
+
+```sh
+cd transform
+uv run dbt docs generate
+uv run dbt docs serve --port 8081
+```
