@@ -66,8 +66,11 @@ docker compose up -d
 
 | Service   | URL                   | What it does                                       |
 | --------- | --------------------- | -------------------------------------------------- |
-| Airflow   | http://localhost:8080 | `serbamart_nightly` at 01:00 WIB, `serbamart_reload` for backfills, `serbamart_stores` closes one more day |
+| Airflow   | http://localhost:8080 | `serbamart_nightly` at 01:00 WIB, `serbamart_freshness` every hour, `serbamart_reload` for backfills, `serbamart_stores` closes one more day |
 | API       | http://localhost:8000 | the online store API                               |
 | Dashboard | http://localhost:8501 | the Streamlit sales dashboard                      |
+| Mailpit   | http://localhost:8025 | alert emails from failed tasks, each with a runbook link |
 
 DuckDB allows one writer, and its lock does not reach from your machine into the containers. While Compose is up, change the warehouse only through Airflow, or run commands inside it: `docker compose exec airflow-scheduler bash`, then `cd /opt/serbamart`. Stop everything with `docker compose down`.
+
+When a task fails, its runbook in `docs/runbooks/` says what to check, how to fix it and how to rerun.
