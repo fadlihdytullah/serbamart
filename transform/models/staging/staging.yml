@@ -39,6 +39,12 @@ models:
         description: Moment of the sale as a timestamp with time zone, also for files that lost their offset.
       - name: sales_date
         description: Day of the sale in Jakarta time (WIB), the business day of every report.
+        data_tests:
+          - volume_vs_same_weekday:
+              arguments:
+                min_ratio: 0.9
+              config:
+                severity: warn
       - name: payment_method
         description: cash, qris, debit or ewallet; unknown when the file left it empty.
         data_tests:
