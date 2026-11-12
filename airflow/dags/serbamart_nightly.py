@@ -14,6 +14,7 @@ alert = SmtpNotifier(
     html_content=(
         "<p>Task <b>{{ ti.task_id }}</b> failed after {{ ti.try_number }} attempt(s).</p>"
         '<p><a href="{{ ti.log_url }}">Open the log</a></p>'
+        '<p><a href="https://github.com/fadlihdytullah/serbamart/blob/main/docs/runbooks/{{ ti.task_id }}.md">Runbook</a></p>'
     ),
 )
 
