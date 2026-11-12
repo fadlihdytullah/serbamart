@@ -16,3 +16,8 @@ models:
     marts:
       +schema: marts
       +materialized: table
+
+data_tests:
+  serbamart:
+    +store_failures: true
+    +schema: audit
